@@ -1,18 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:stash_notes/register.dart';
 
-class Login extends StatefulWidget {
-  const Login({super.key});
+class RegisterScreen extends StatefulWidget {
+  const RegisterScreen({super.key});
 
   @override
-  State<Login> createState() => _LoginState();
+  State<RegisterScreen> createState() => _RegisterScreenState();
 }
 
-class _LoginState extends State<Login> {
+class _RegisterScreenState extends State<RegisterScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Login')),
+      appBar: AppBar(title: Text('Register')),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Center(
@@ -34,8 +33,11 @@ class _LoginState extends State<Login> {
                     obscureText: true,
                     decoration: InputDecoration(labelText: 'Password'),
                   ),
+                  TextField(
+                    obscureText: true,
+                    decoration: InputDecoration(labelText: 'Confirm password'),
+                  ),
                   FilledButton(onPressed: () {}, child: Text('Continue')),
-                  TextButton(onPressed: () {}, child: Text('Forgot password')),
                   Row(
                     spacing: 16,
                     children: [
@@ -50,12 +52,9 @@ class _LoginState extends State<Login> {
                   ),
                   TextButton(
                     onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => Register()),
-                      );
+                      Navigator.maybePop(context);
                     },
-                    child: Text('Create an account'),
+                    child: Text('Already have an account? Login here'),
                   ),
                 ],
               ),
