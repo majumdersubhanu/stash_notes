@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "1047212689029",
+    "project_id": "stash-notes",
+    "storage_bucket": "stash-notes.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1047212689029:android:d3881b85b7039032ad4bec",
+        "android_client_info": {
+          "package_name": "com.example.stash_notes"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1047212689029-4at0hnh8503kem4t2ftkgkv7hdjlerar.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCyhOXEE0OU0enw4cwgmBvH1GrC5Oe-LzE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1047212689029-4at0hnh8503kem4t2ftkgkv7hdjlerar.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "1047212689029-lln5ndh1a0f5k5dh4j640npmov2anrjg.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.stashnote"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
