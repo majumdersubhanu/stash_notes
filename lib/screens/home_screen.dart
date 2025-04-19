@@ -72,13 +72,7 @@ class _HomeScreenState extends State<HomeScreen> {
           title:
               _selectedNoteIds.isNotEmpty
                   ? Text('${_selectedNoteIds.length} selected')
-                  : Text(
-                    'My Notes',
-                    style: Theme.of(context).textTheme.displaySmall?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      color: Theme.of(context).colorScheme.onSurface,
-                    ),
-                  ),
+                  : Text('My Notes'),
           actions:
               _selectedNoteIds.isNotEmpty
                   ? [
@@ -179,7 +173,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               color:
                                   Theme.of(
                                     context,
-                                  ).colorScheme.surfaceContainerHighest,
+                                  ).colorScheme.surfaceContainerLowest,
                               borderRadius: BorderRadius.circular(12),
                               border: Border.all(
                                 color:
