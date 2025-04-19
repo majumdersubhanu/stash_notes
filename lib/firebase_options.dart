@@ -59,4 +59,5 @@ class DefaultFirebaseOptions {
     projectId: 'stash-notes',
     storageBucket: 'stash-notes.firebasestorage.app',
   );
+
 }

@@ -14,6 +14,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "1047212689029-b81ed6g6sa8t2g4sei3qc3hocdto1mfo.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.stash_notes",
+            "certificate_hash": "563de61b8079245c4ec25fb7e2f89c5e94fa4af7"
+          }
+        },
+        {
           "client_id": "1047212689029-4at0hnh8503kem4t2ftkgkv7hdjlerar.apps.googleusercontent.com",
           "client_type": 3
         }
