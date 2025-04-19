@@ -1,15 +1,17 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class NoteEditorScreen extends StatefulWidget {
+  final String? docId;
   final String? initialTitle;
   final String? initialDescription;
-  final void Function(String title, String description)? onSave;
 
   const NoteEditorScreen({
     super.key,
+    this.docId,
     this.initialTitle,
     this.initialDescription,
-    this.onSave,
   });
 
   @override
@@ -94,14 +96,34 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
     );
   }
 
-  void _handleSave() {
+  Future<void> _handleSave() async {
     final title = _titleController.text.trim();
     final description = _descriptionController.text.trim();
     if (title.isEmpty && description.isEmpty) {
-      Navigator.pop(context); // Discard empty note
+      Navigator.pop(context);
       return;
     }
-    widget.onSave?.call(title, description);
-    Navigator.pop(context); // Exit screen
+
+    final uid = FirebaseAuth.instance.currentUser?.uid;
+    if (uid == null) return;
+
+    final noteData = {
+      'title': title,
+      'description': description,
+      'timestamp': FieldValue.serverTimestamp(),
+    };
+
+    final notesRef = FirebaseFirestore.instance
+        .collection('users')
+        .doc(uid)
+        .collection('notes');
+
+    if (widget.docId != null) {
+      await notesRef.doc(widget.docId).update(noteData);
+    } else {
+      await notesRef.add(noteData);
+    }
+
+    if (mounted) Navigator.pop(context);
   }
 }

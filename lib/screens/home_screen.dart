@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
@@ -12,38 +13,55 @@ class HomeScreen extends StatefulWidget {
 }
 
 class Note {
+  final String id;
   final String title;
   final String description;
 
-  Note({required this.title, required this.description});
+  Note({required this.id, required this.title, required this.description});
 
-  Note copyWith({String? title, String? description}) {
+  factory Note.fromDoc(DocumentSnapshot doc) {
+    final data = doc.data() as Map<String, dynamic>;
     return Note(
-      title: title ?? this.title,
-      description: description ?? this.description,
+      id: doc.id,
+      title: data['title'] ?? '',
+      description: data['description'] ?? '',
     );
+  }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'title': title,
+      'description': description,
+      'timestamp': FieldValue.serverTimestamp(),
+    };
   }
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  final List<Note> _notes = [];
-  final Set<int> _selectedNoteIndices = {};
   String _searchQuery = '';
+  final Set<String> _selectedNoteIds = {};
   bool _fabExpanded = false;
+
+  Stream<List<Note>> get _notesStream {
+    final uid = FirebaseAuth.instance.currentUser?.uid;
+    if (uid == null) return const Stream.empty();
+    return FirebaseFirestore.instance
+        .collection('users')
+        .doc(uid)
+        .collection('notes')
+        .orderBy('timestamp', descending: true)
+        .snapshots()
+        .map(
+          (snapshot) => snapshot.docs.map((doc) => Note.fromDoc(doc)).toList(),
+        );
+  }
 
   @override
   Widget build(BuildContext context) {
-    final filteredNotes =
-        _notes.where((note) {
-          final query = _searchQuery.toLowerCase();
-          return note.title.toLowerCase().contains(query) ||
-              note.description.toLowerCase().contains(query);
-        }).toList();
-
     return WillPopScope(
       onWillPop: () async {
-        if (_selectedNoteIndices.isNotEmpty) {
-          setState(() => _selectedNoteIndices.clear());
+        if (_selectedNoteIds.isNotEmpty) {
+          setState(() => _selectedNoteIds.clear());
           return false;
         }
         return true;
@@ -52,8 +70,8 @@ class _HomeScreenState extends State<HomeScreen> {
         appBar: AppBar(
           forceMaterialTransparency: true,
           title:
-              _selectedNoteIndices.isNotEmpty
-                  ? Text('${_selectedNoteIndices.length} selected')
+              _selectedNoteIds.isNotEmpty
+                  ? Text('${_selectedNoteIds.length} selected')
                   : Text(
                     'My Notes',
                     style: Theme.of(context).textTheme.displaySmall?.copyWith(
@@ -62,7 +80,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   ),
           actions:
-              _selectedNoteIndices.isNotEmpty
+              _selectedNoteIds.isNotEmpty
                   ? [
                     IconButton(
                       icon: const Icon(Icons.delete_outline),
@@ -70,8 +88,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                     IconButton(
                       icon: const Icon(Icons.close),
-                      onPressed:
-                          () => setState(() => _selectedNoteIndices.clear()),
+                      onPressed: () => setState(() => _selectedNoteIds.clear()),
                     ),
                   ]
                   : [
@@ -83,7 +100,6 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
         body: Column(
           children: [
-            // Search Bar
             Padding(
               padding: const EdgeInsets.all(12.0),
               child: TextField(
@@ -101,95 +117,107 @@ class _HomeScreenState extends State<HomeScreen> {
                 },
               ),
             ),
-
             const SizedBox(height: 12),
-
-            // Notes Grid
             Expanded(
-              child:
-                  filteredNotes.isEmpty
-                      ? Center(
-                        child: Text(
-                          'No notes yet. Tap + to create one!',
-                          style: Theme.of(context).textTheme.bodyLarge,
-                        ),
-                      )
-                      : Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 12.0),
-                        child: MasonryGridView.count(
-                          crossAxisCount: 2,
-                          mainAxisSpacing: 8,
-                          crossAxisSpacing: 8,
-                          itemCount: filteredNotes.length,
-                          itemBuilder: (context, index) {
-                            final note = filteredNotes[index];
-                            final actualIndex = _notes.indexOf(note);
-                            final isSelected = _selectedNoteIndices.contains(
-                              actualIndex,
-                            );
+              child: StreamBuilder<List<Note>>(
+                stream: _notesStream,
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
 
-                            return GestureDetector(
-                              onTap: () {
-                                if (_selectedNoteIndices.isNotEmpty) {
-                                  _toggleSelection(actualIndex);
-                                } else {
-                                  _editNote(actualIndex, note);
-                                }
-                              },
-                              onLongPress: () => _toggleSelection(actualIndex),
-                              child: Container(
-                                padding: const EdgeInsets.all(12),
-                                decoration: BoxDecoration(
-                                  color:
-                                      Theme.of(
-                                        context,
-                                      ).colorScheme.surfaceContainerHighest,
-                                  borderRadius: BorderRadius.circular(12),
-                                  border: Border.all(
-                                    color:
-                                        isSelected
-                                            ? Theme.of(
-                                              context,
-                                            ).colorScheme.primary
-                                            : Theme.of(
-                                              context,
-                                            ).colorScheme.outlineVariant,
-                                    width: isSelected ? 2.5 : 1,
-                                  ),
-                                ),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      note.title,
-                                      style: Theme.of(
-                                        context,
-                                      ).textTheme.titleMedium?.copyWith(
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 8),
-                                    Text(
-                                      note.description,
-                                      style:
-                                          Theme.of(
-                                            context,
-                                          ).textTheme.bodyMedium,
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            );
-                          },
-                        ),
+                  final notes = snapshot.data ?? [];
+                  final filtered =
+                      notes.where((note) {
+                        final query = _searchQuery.toLowerCase();
+                        return note.title.toLowerCase().contains(query) ||
+                            note.description.toLowerCase().contains(query);
+                      }).toList();
+
+                  if (filtered.isEmpty) {
+                    return Center(
+                      child: Text(
+                        'No notes yet. Tap + to create one!',
+                        style: Theme.of(context).textTheme.bodyLarge,
                       ),
+                    );
+                  }
+
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 12.0),
+                    child: MasonryGridView.count(
+                      crossAxisCount: 2,
+                      mainAxisSpacing: 8,
+                      crossAxisSpacing: 8,
+                      itemCount: filtered.length,
+                      itemBuilder: (context, index) {
+                        final note = filtered[index];
+                        final isSelected = _selectedNoteIds.contains(note.id);
+
+                        return GestureDetector(
+                          onTap: () {
+                            if (_selectedNoteIds.isNotEmpty) {
+                              _toggleSelection(note.id);
+                            } else {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder:
+                                      (_) => NoteEditorScreen(
+                                        docId: note.id,
+                                        initialTitle: note.title,
+                                        initialDescription: note.description,
+                                      ),
+                                ),
+                              );
+                            }
+                          },
+                          onLongPress: () => _toggleSelection(note.id),
+                          child: Container(
+                            padding: const EdgeInsets.all(12),
+                            decoration: BoxDecoration(
+                              color:
+                                  Theme.of(
+                                    context,
+                                  ).colorScheme.surfaceContainerHighest,
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(
+                                color:
+                                    isSelected
+                                        ? Theme.of(context).colorScheme.primary
+                                        : Theme.of(
+                                          context,
+                                        ).colorScheme.outlineVariant,
+                                width: isSelected ? 2.5 : 1,
+                              ),
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  note.title,
+                                  style: Theme.of(context).textTheme.titleMedium
+                                      ?.copyWith(fontWeight: FontWeight.bold),
+                                ),
+                                const SizedBox(height: 8),
+                                Text(
+                                  note.description,
+                                  style: Theme.of(context).textTheme.bodyMedium,
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  );
+                },
+              ),
             ),
           ],
         ),
-
-        // Expandable FAB
         floatingActionButton:
-            _selectedNoteIndices.isNotEmpty
+            _selectedNoteIds.isNotEmpty
                 ? null
                 : Column(
                   mainAxisSize: MainAxisSize.min,
@@ -202,16 +230,14 @@ class _HomeScreenState extends State<HomeScreen> {
                         _openNoteEditor,
                       ),
                       _buildFabAction(Icons.mic, 'New Recording', () {
-                        // TODO: Implement voice note
                         ScaffoldMessenger.of(
                           context,
-                        ).showSnackBar(SnackBar(content: Text('WIP')));
+                        ).showSnackBar(const SnackBar(content: Text('WIP')));
                       }),
                       _buildFabAction(Icons.list_alt, 'New List', () {
-                        // TODO: Implement list note
                         ScaffoldMessenger.of(
                           context,
-                        ).showSnackBar(SnackBar(content: Text('WIP')));
+                        ).showSnackBar(const SnackBar(content: Text('WIP')));
                       }),
                       const SizedBox(height: 10),
                     ],
@@ -266,37 +292,24 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  void _deleteSelectedNotes() {
-    setState(() {
-      _selectedNoteIndices.toList()
-        ..sort((a, b) => b.compareTo(a))
-        ..forEach((index) => _notes.removeAt(index));
-      _selectedNoteIndices.clear();
-    });
+  void _deleteSelectedNotes() async {
+    final uid = FirebaseAuth.instance.currentUser?.uid;
+    if (uid == null) return;
+
+    final batch = FirebaseFirestore.instance.batch();
+    for (var noteId in _selectedNoteIds) {
+      final docRef = FirebaseFirestore.instance
+          .collection('users')
+          .doc(uid)
+          .collection('notes')
+          .doc(noteId);
+      batch.delete(docRef);
+    }
+    await batch.commit();
+    setState(() => _selectedNoteIds.clear());
   }
 
-  void _editNote(int index, Note existingNote) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder:
-            (_) => NoteEditorScreen(
-              initialTitle: existingNote.title,
-              initialDescription: existingNote.description,
-              onSave: (title, description) {
-                setState(() {
-                  _notes[index] = existingNote.copyWith(
-                    title: title,
-                    description: description,
-                  );
-                });
-              },
-            ),
-      ),
-    );
-  }
-
-  Future<void> _logout() async {
+  void _logout() async {
     await FirebaseAuth.instance.signOut();
     if (mounted) {
       Navigator.pushReplacement(
@@ -312,25 +325,16 @@ class _HomeScreenState extends State<HomeScreen> {
   void _openNoteEditor() {
     Navigator.push(
       context,
-      MaterialPageRoute(
-        builder:
-            (_) => NoteEditorScreen(
-              onSave: (title, description) {
-                setState(() {
-                  _notes.add(Note(title: title, description: description));
-                });
-              },
-            ),
-      ),
+      MaterialPageRoute(builder: (_) => NoteEditorScreen()),
     );
   }
 
-  void _toggleSelection(int index) {
+  void _toggleSelection(String id) {
     setState(() {
-      if (_selectedNoteIndices.contains(index)) {
-        _selectedNoteIndices.remove(index);
+      if (_selectedNoteIds.contains(id)) {
+        _selectedNoteIds.remove(id);
       } else {
-        _selectedNoteIndices.add(index);
+        _selectedNoteIds.add(id);
       }
     });
   }
