@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 
 class NoteEditorScreen extends StatefulWidget {
@@ -21,7 +19,6 @@ class NoteEditorScreen extends StatefulWidget {
 class _NoteEditorScreenState extends State<NoteEditorScreen> {
   late TextEditingController _titleController;
   late TextEditingController _descriptionController;
-  Timer? _autoSaveTimer;
 
   @override
   Widget build(BuildContext context) {
@@ -34,9 +31,12 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
           icon: const Icon(Icons.arrow_back),
           onPressed: () => Navigator.pop(context),
         ),
-        actions: const [
-          IconButton(icon: Icon(Icons.push_pin_outlined), onPressed: null),
-          IconButton(icon: Icon(Icons.archive_outlined), onPressed: null),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.save),
+            tooltip: 'Save',
+            onPressed: _handleSave,
+          ),
         ],
       ),
       body: Column(
@@ -80,10 +80,6 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
 
   @override
   void dispose() {
-    _autoSaveTimer?.cancel();
-    _titleController.removeListener(_triggerAutoSave);
-    _descriptionController.removeListener(_triggerAutoSave);
-    _saveNote(); // final save on exit
     _titleController.dispose();
     _descriptionController.dispose();
     super.dispose();
@@ -96,21 +92,16 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
     _descriptionController = TextEditingController(
       text: widget.initialDescription ?? '',
     );
-
-    _titleController.addListener(_triggerAutoSave);
-    _descriptionController.addListener(_triggerAutoSave);
   }
 
-  void _saveNote() {
+  void _handleSave() {
     final title = _titleController.text.trim();
     final description = _descriptionController.text.trim();
-    if (title.isEmpty && description.isEmpty) return;
-
+    if (title.isEmpty && description.isEmpty) {
+      Navigator.pop(context); // Discard empty note
+      return;
+    }
     widget.onSave?.call(title, description);
-  }
-
-  void _triggerAutoSave() {
-    _autoSaveTimer?.cancel();
-    _autoSaveTimer = Timer(const Duration(milliseconds: 800), _saveNote);
+    Navigator.pop(context); // Exit screen
   }
 }
