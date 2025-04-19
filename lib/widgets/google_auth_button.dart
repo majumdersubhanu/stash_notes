@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:stash_notes/home_screen.dart';
+import 'package:stash_notes/screens/home_screen.dart';
 
 class GoogleAuthButton extends StatelessWidget {
   const GoogleAuthButton({super.key});

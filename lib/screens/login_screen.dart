@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:stash_notes/register_screen.dart';
+import 'package:stash_notes/screens/register_screen.dart';
 import 'package:stash_notes/widgets/auth_form_container.dart';
 import 'package:stash_notes/widgets/auth_text_field.dart';
 import 'package:stash_notes/widgets/google_auth_button.dart';
