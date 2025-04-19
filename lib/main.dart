@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:stash_notes/login_screen.dart';
 
 void main() {
@@ -10,6 +11,12 @@ class MainApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(home: LoginScreen());
+    return MaterialApp(
+      home: LoginScreen(),
+      theme: ThemeData(useMaterial3: true).copyWith(
+        textTheme: GoogleFonts.interTextTheme(),
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.indigo),
+      ),
+    );
   }
 }
