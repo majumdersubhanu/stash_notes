@@ -12,11 +12,20 @@ class MainApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       home: LoginScreen(),
       theme: ThemeData(useMaterial3: true).copyWith(
         textTheme: GoogleFonts.interTextTheme(),
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.indigo),
       ),
+      darkTheme: ThemeData.dark(useMaterial3: true).copyWith(
+        textTheme: GoogleFonts.interTextTheme(ThemeData.light().textTheme),
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: Colors.indigo,
+          brightness: Brightness.dark,
+        ),
+      ),
+      themeMode: ThemeMode.system,
     );
   }
 }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:stash_notes/login_screen.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -18,7 +19,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.inversePrimary,
       resizeToAvoidBottomInset: false,
       body: Padding(
         padding: const EdgeInsets.all(16),
@@ -26,8 +26,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
           child: Container(
             padding: EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: Colors.white,
+              // color: Theme.of(context).colorScheme.secondary,
               borderRadius: BorderRadius.circular(16),
+              border: Border.all(
+                color: Theme.of(context).colorScheme.onSurface,
+              ),
             ),
             child: ConstrainedBox(
               constraints: BoxConstraints(maxWidth: 350),
@@ -41,15 +44,19 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     children: [
                       Text(
                         'Register',
-                        style: TextStyle(
-                          fontSize: 32,
+                        style: Theme.of(
+                          context,
+                        ).textTheme.displayMedium?.copyWith(
                           fontWeight: FontWeight.bold,
+                          color: Theme.of(context).colorScheme.onSurface,
                         ),
                       ),
                       SizedBox(height: 8),
                       Text(
                         'Register and STASH away your notes',
-                        style: TextStyle(fontSize: 16),
+                        style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                          color: Theme.of(context).colorScheme.onSurface,
+                        ),
                       ),
                       SizedBox(height: 48),
                       TextFormField(
@@ -106,15 +113,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         obscureText: true,
                         decoration: InputDecoration(
                           labelText: 'Password',
-                          helper: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text('8 characters'),
-                              Text('1 upper case letter'),
-                              Text('1 lower case letter'),
-                              Text('1 special character'),
-                              Text('1 number'),
-                            ],
+                          hintText: 'At least 8 characters',
+                          helper: Text(
+                            '1 upper case letter\n1 lower case letter\n1 special character\n1 number',
+                            style: Theme.of(
+                              context,
+                            ).textTheme.bodySmall?.copyWith(
+                              color: Theme.of(context).colorScheme.onSurface,
+                            ),
                           ),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
@@ -146,58 +152,29 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         ),
                       ),
                       SizedBox(height: 32),
-                      FilledButton(
+                      FilledButton.icon(
                         onPressed: () {},
-                        child: Text('Continue with email'),
+                        label: Text('Continue with email'),
+                        icon: Icon(Icons.verified),
                       ),
                       SizedBox(height: 24),
                       Row(
                         spacing: 16,
                         children: [
                           Expanded(child: Divider()),
-                          Text('OR'),
+                          Text(
+                            'OR',
+                            style: Theme.of(
+                              context,
+                            ).textTheme.bodyMedium?.copyWith(
+                              color: Theme.of(context).colorScheme.onSurface,
+                            ),
+                          ),
                           Expanded(child: Divider()),
                         ],
                       ),
                       SizedBox(height: 24),
-                      GestureDetector(
-                        child: Container(
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(16),
-                            color: Color(0xFF4285F4),
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsets.all(4.0),
-                            child: Row(
-                              children: [
-                                Container(
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.circular(13),
-                                  ),
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(4.0),
-                                    child: Image.asset(
-                                      'assets/icons/google.png',
-                                      height: 32,
-                                      width: 32,
-                                    ),
-                                  ),
-                                ),
-                                Expanded(
-                                  child: Align(
-                                    alignment: Alignment.center,
-                                    child: Text(
-                                      'Continue with Google',
-                                      style: TextStyle(color: Colors.white),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
+                      GoogleAuthButton(),
                       SizedBox(height: 16),
                       TextButton(
                         onPressed: () {

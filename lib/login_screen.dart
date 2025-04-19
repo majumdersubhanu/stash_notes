@@ -17,7 +17,6 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.inversePrimary,
       resizeToAvoidBottomInset: false,
       body: Padding(
         padding: const EdgeInsets.all(16),
@@ -25,8 +24,11 @@ class _LoginScreenState extends State<LoginScreen> {
           child: Container(
             padding: EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: Colors.white,
+              // color: Theme.of(context).colorScheme.secondary,
               borderRadius: BorderRadius.circular(16),
+              border: Border.all(
+                color: Theme.of(context).colorScheme.onSurface,
+              ),
             ),
             child: ConstrainedBox(
               constraints: BoxConstraints(maxWidth: 350),
@@ -40,15 +42,19 @@ class _LoginScreenState extends State<LoginScreen> {
                     children: [
                       Text(
                         'Login',
-                        style: TextStyle(
-                          fontSize: 32,
+                        style: Theme.of(
+                          context,
+                        ).textTheme.displayMedium?.copyWith(
                           fontWeight: FontWeight.bold,
+                          color: Theme.of(context).colorScheme.onSurface,
                         ),
                       ),
                       SizedBox(height: 8),
                       Text(
                         'Welcome back to StashNotes',
-                        style: TextStyle(fontSize: 16),
+                        style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                          color: Theme.of(context).colorScheme.onSurface,
+                        ),
                       ),
                       SizedBox(height: 48),
                       TextFormField(
@@ -97,7 +103,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                       ),
                       SizedBox(height: 32),
-                      FilledButton(
+                      FilledButton.icon(
                         onPressed: () {
                           if (_formKey.currentState!.validate()) {
                             ScaffoldMessenger.of(context).showSnackBar(
@@ -105,7 +111,8 @@ class _LoginScreenState extends State<LoginScreen> {
                             );
                           }
                         },
-                        child: Text('Continue with email'),
+                        label: Text('Continue with email'),
+                        icon: Icon(Icons.verified),
                       ),
                       SizedBox(height: 16),
                       TextButton(
@@ -117,49 +124,19 @@ class _LoginScreenState extends State<LoginScreen> {
                         spacing: 16,
                         children: [
                           Expanded(child: Divider()),
-                          Text('OR'),
+                          Text(
+                            'OR',
+                            style: Theme.of(
+                              context,
+                            ).textTheme.bodyMedium?.copyWith(
+                              color: Theme.of(context).colorScheme.onSurface,
+                            ),
+                          ),
                           Expanded(child: Divider()),
                         ],
                       ),
                       SizedBox(height: 24),
-                      GestureDetector(
-                        child: Container(
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(16),
-                            color: Color(0xFF4285F4),
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsets.all(4.0),
-                            child: Row(
-                              children: [
-                                Container(
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.circular(13),
-                                  ),
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(4.0),
-                                    child: Image.asset(
-                                      'assets/icons/google.png',
-                                      height: 32,
-                                      width: 32,
-                                    ),
-                                  ),
-                                ),
-                                Expanded(
-                                  child: Align(
-                                    alignment: Alignment.center,
-                                    child: Text(
-                                      'Continue with Google',
-                                      style: TextStyle(color: Colors.white),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
+                      GoogleAuthButton(),
                       SizedBox(height: 16),
                       TextButton(
                         onPressed: () {
@@ -185,6 +162,52 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
               ),
             ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class GoogleAuthButton extends StatelessWidget {
+  const GoogleAuthButton({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(16),
+          color: Color(0xFF4285F4),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(4.0),
+          child: Row(
+            children: [
+              Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(13),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(4.0),
+                  child: Image.asset(
+                    'assets/icons/google.png',
+                    height: 32,
+                    width: 32,
+                  ),
+                ),
+              ),
+              Expanded(
+                child: Align(
+                  alignment: Alignment.center,
+                  child: Text(
+                    'Continue with Google',
+                    style: TextStyle(color: Colors.white),
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
       ),
