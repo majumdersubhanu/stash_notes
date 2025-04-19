@@ -1,4 +1,8 @@
+import 'dart:developer';
+
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:stash_notes/screens/home_screen.dart';
 import 'package:stash_notes/widgets/auth_form_container.dart';
 import 'package:stash_notes/widgets/auth_text_field.dart';
 import 'package:stash_notes/widgets/google_auth_button.dart';
@@ -65,9 +69,22 @@ class _RegisterScreenState extends State<RegisterScreen> {
               ),
               const SizedBox(height: 32),
               FilledButton.icon(
-                onPressed: () {
+                onPressed: () async {
                   if (_formKey.currentState!.validate()) {
-                    // Submit registration
+                    String emailAddress = _emailController.text;
+                    String password = _passwordController.text;
+                    final loginStatus = await _registerWithEmailPassword(
+                      emailAddress,
+                      password,
+                    );
+                    if (context.mounted) {
+                      if (loginStatus) {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => HomeScreen()),
+                        );
+                      }
+                    }
                   }
                 },
                 icon: const Icon(Icons.verified),
@@ -103,6 +120,29 @@ class _RegisterScreenState extends State<RegisterScreen> {
         ),
       ),
     );
+  }
+
+  Future<bool> _registerWithEmailPassword(
+    String emailAddress,
+    String password,
+  ) async {
+    try {
+      final credential = await FirebaseAuth.instance.signInWithEmailAndPassword(
+        email: emailAddress,
+        password: password,
+      );
+
+      if (credential.user != null) {
+        return true;
+      }
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'user-not-found') {
+        log('[Firebase Auth] No user found for that email.');
+      } else if (e.code == 'wrong-password') {
+        log('[Firebase Auth] Wrong password provided for that user.');
+      }
+    }
+    return false;
   }
 
   String? _validateEmail(String? value) {
