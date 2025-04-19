@@ -34,7 +34,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 label: 'Email address',
                 hint: 'john.doe@xyz.com',
                 validator: _validateEmail,
-                prefixIcon: const Icon(Icons.alternate_email),
+                prefixIcon: const Icon(Icons.email_outlined),
               ),
               const SizedBox(height: 16),
               AuthTextField(
