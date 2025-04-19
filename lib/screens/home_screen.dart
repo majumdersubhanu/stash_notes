@@ -14,15 +14,13 @@ class HomeScreen extends StatefulWidget {
 class Note {
   final String title;
   final String description;
-  final Color color;
 
-  Note({required this.title, required this.description, required this.color});
+  Note({required this.title, required this.description});
 
-  Note copyWith({String? title, String? description, Color? color}) {
+  Note copyWith({String? title, String? description}) {
     return Note(
       title: title ?? this.title,
       description: description ?? this.description,
-      color: color ?? this.color,
     );
   }
 }
@@ -142,24 +140,22 @@ class _HomeScreenState extends State<HomeScreen> {
                               child: Container(
                                 padding: const EdgeInsets.all(12),
                                 decoration: BoxDecoration(
-                                  color: note.color,
+                                  color:
+                                      Theme.of(
+                                        context,
+                                      ).colorScheme.surfaceContainerHighest,
                                   borderRadius: BorderRadius.circular(12),
-
-                                  border:
-                                      isSelected
-                                          ? Border.all(
-                                            color:
-                                                Theme.of(
-                                                  context,
-                                                ).colorScheme.primary,
-                                            width: 2.5,
-                                          )
-                                          : Border.all(
-                                            color:
-                                                Theme.of(
-                                                  context,
-                                                ).colorScheme.onSurface,
-                                          ),
+                                  border: Border.all(
+                                    color:
+                                        isSelected
+                                            ? Theme.of(
+                                              context,
+                                            ).colorScheme.primary
+                                            : Theme.of(
+                                              context,
+                                            ).colorScheme.outlineVariant,
+                                    width: isSelected ? 2.5 : 1,
+                                  ),
                                 ),
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -207,9 +203,15 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                       _buildFabAction(Icons.mic, 'New Recording', () {
                         // TODO: Implement voice note
+                        ScaffoldMessenger.of(
+                          context,
+                        ).showSnackBar(SnackBar(content: Text('WIP')));
                       }),
                       _buildFabAction(Icons.list_alt, 'New List', () {
                         // TODO: Implement list note
+                        ScaffoldMessenger.of(
+                          context,
+                        ).showSnackBar(SnackBar(content: Text('WIP')));
                       }),
                       const SizedBox(height: 10),
                     ],
@@ -281,12 +283,11 @@ class _HomeScreenState extends State<HomeScreen> {
             (_) => NoteEditorScreen(
               initialTitle: existingNote.title,
               initialDescription: existingNote.description,
-              onSave: (title, description, color) {
+              onSave: (title, description) {
                 setState(() {
                   _notes[index] = existingNote.copyWith(
                     title: title,
                     description: description,
-                    color: color,
                   );
                 });
               },
@@ -300,11 +301,11 @@ class _HomeScreenState extends State<HomeScreen> {
     if (mounted) {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => LoginScreen()),
+        MaterialPageRoute(builder: (context) => const LoginScreen()),
       );
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(SnackBar(content: Text('Signed out successfully')));
+      ).showSnackBar(const SnackBar(content: Text('Signed out successfully')));
     }
   }
 
@@ -314,11 +315,9 @@ class _HomeScreenState extends State<HomeScreen> {
       MaterialPageRoute(
         builder:
             (_) => NoteEditorScreen(
-              onSave: (title, description, color) {
+              onSave: (title, description) {
                 setState(() {
-                  _notes.add(
-                    Note(title: title, description: description, color: color),
-                  );
+                  _notes.add(Note(title: title, description: description));
                 });
               },
             ),

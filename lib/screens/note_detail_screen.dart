@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 class NoteEditorScreen extends StatefulWidget {
   final String? initialTitle;
   final String? initialDescription;
-  final void Function(String title, String description, Color color)? onSave;
+  final void Function(String title, String description)? onSave;
 
   const NoteEditorScreen({
     super.key,
@@ -19,46 +19,14 @@ class NoteEditorScreen extends StatefulWidget {
 }
 
 class _NoteEditorScreenState extends State<NoteEditorScreen> {
-  // Light & dark mode color palettes
-  static const List<Color> _lightNoteColors = [
-    Colors.white,
-    Color(0xFFFFF8E1),
-    Color(0xFFE1F5FE),
-    Color(0xFFF1F8E9),
-    Color(0xFFFFEBEE),
-    Color(0xFFFFF3E0),
-    Color(0xFFEDE7F6),
-  ];
-  static const List<Color> _darkNoteColors = [
-    Color(0xFF303030),
-    Color(0xFF424242),
-    Color(0xFF37474F),
-    Color(0xFF2E7D32),
-    Color(0xFF4E342E),
-    Color(0xFF5D4037),
-    Color(0xFF4527A0),
-  ];
   late TextEditingController _titleController;
   late TextEditingController _descriptionController;
-
-  late Color _selectedColor;
-
   Timer? _autoSaveTimer;
-
-  bool get isDarkMode => Theme.of(context).brightness == Brightness.dark;
-
-  List<Color> get _noteColors =>
-      isDarkMode ? _darkNoteColors : _lightNoteColors;
 
   @override
   Widget build(BuildContext context) {
-    final Color bgColor =
-        _selectedColor == Colors.transparent
-            ? Theme.of(context).scaffoldBackgroundColor
-            : _selectedColor;
-
     return Scaffold(
-      backgroundColor: bgColor,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -73,7 +41,6 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
       ),
       body: Column(
         children: [
-          // Title + Description Inputs
           Expanded(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -106,50 +73,6 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
               ),
             ),
           ),
-
-          // Color Picker
-          Padding(
-            padding: const EdgeInsets.only(bottom: 32, left: 16, right: 16),
-            child: SizedBox(
-              height: 48,
-              child: ListView.builder(
-                scrollDirection: Axis.horizontal,
-                itemCount: _noteColors.length,
-                itemBuilder: (context, index) {
-                  final color = _noteColors[index];
-                  final isSelected = color == _selectedColor;
-
-                  return GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        _selectedColor = color;
-                      });
-                      _triggerAutoSave();
-                    },
-                    child: AnimatedContainer(
-                      duration: const Duration(milliseconds: 200),
-                      margin: const EdgeInsets.symmetric(horizontal: 6),
-                      width: 36,
-                      height: 36,
-                      decoration: BoxDecoration(
-                        color: color,
-                        shape: BoxShape.circle,
-                        border: Border.all(
-                          color:
-                              isSelected
-                                  ? Colors.black.withOpacity(0.7)
-                                  : Colors.transparent,
-                          width: 2,
-                        ),
-                      ),
-                      child:
-                          isSelected ? const Icon(Icons.check, size: 18) : null,
-                    ),
-                  );
-                },
-              ),
-            ),
-          ),
         ],
       ),
     );
@@ -173,7 +96,6 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
     _descriptionController = TextEditingController(
       text: widget.initialDescription ?? '',
     );
-    _selectedColor = Colors.transparent;
 
     _titleController.addListener(_triggerAutoSave);
     _descriptionController.addListener(_triggerAutoSave);
@@ -184,19 +106,11 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
     final description = _descriptionController.text.trim();
     if (title.isEmpty && description.isEmpty) return;
 
-    widget.onSave?.call(
-      title,
-      description,
-      _selectedColor == Colors.transparent
-          ? Theme.of(context).scaffoldBackgroundColor
-          : _selectedColor,
-    );
+    widget.onSave?.call(title, description);
   }
 
   void _triggerAutoSave() {
     _autoSaveTimer?.cancel();
-    _autoSaveTimer = Timer(const Duration(milliseconds: 800), () {
-      _saveNote();
-    });
+    _autoSaveTimer = Timer(const Duration(milliseconds: 800), _saveNote);
   }
 }

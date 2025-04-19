@@ -39,6 +39,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 hint: 'john.doe@xyz.com',
                 validator: _validateEmail,
                 prefixIcon: const Icon(Icons.email_outlined),
+                keyboardType: TextInputType.emailAddress,
               ),
               const SizedBox(height: 16),
               AuthTextField(
@@ -129,6 +130,12 @@ class _LoginScreenState extends State<LoginScreen> {
       );
 
       if (credential.user != null) {
+        if (mounted) {
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text('Logged in successfully')));
+        }
+
         return true;
       }
     } on FirebaseAuthException catch (e) {

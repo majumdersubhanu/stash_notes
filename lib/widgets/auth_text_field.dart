@@ -10,6 +10,8 @@ class AuthTextField extends StatelessWidget {
   final Widget? suffixIcon;
   final Widget? helper;
 
+  final TextInputType? keyboardType;
+
   const AuthTextField({
     super.key,
     required this.controller,
@@ -20,6 +22,7 @@ class AuthTextField extends StatelessWidget {
     this.prefixIcon,
     this.suffixIcon,
     this.helper,
+    this.keyboardType,
   });
 
   @override
@@ -37,6 +40,7 @@ class AuthTextField extends StatelessWidget {
         prefixIcon: prefixIcon,
         suffixIcon: suffixIcon,
       ),
+      keyboardType: keyboardType,
     );
   }
 }

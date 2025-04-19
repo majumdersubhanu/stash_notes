@@ -39,6 +39,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 hint: 'john.doe@xyz.com',
                 validator: _validateEmail,
                 prefixIcon: const Icon(Icons.email_outlined),
+                keyboardType: TextInputType.emailAddress,
               ),
               const SizedBox(height: 16),
               AuthTextField(
@@ -132,12 +133,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
             email: emailAddress,
             password: password,
           );
-      if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Registered successfully')));
-      }
       if (credential.user != null) {
+        if (mounted) {
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text('Registered successfully')));
+        }
         return true;
       }
     } on FirebaseAuthException catch (e) {
