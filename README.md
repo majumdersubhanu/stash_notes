@@ -147,3 +147,9 @@ dependencies {
 flutter pub get
 flutter run
 ```
+---
+
+## 👨‍💻 Author
+
+Made with ❤️ by Subhanu Majumder  
+[GitHub](https://github.com/majumdersubhanu) | [LinkedIn](https://linkedin.com/in/subhanumajumder)
