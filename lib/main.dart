@@ -12,7 +12,7 @@ Future<void> main() async {
 
   final currUser = FirebaseAuth.instance.currentUser;
 
-  final isAuthenticated = currUser == null;
+  final isAuthenticated = currUser != null;
 
   runApp(MainApp(isAuthenticated: isAuthenticated));
 }
