@@ -1,5 +1,7 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
+import 'package:stash_notes/screens/login_screen.dart';
 import 'package:stash_notes/screens/note_detail_screen.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -74,7 +76,12 @@ class _HomeScreenState extends State<HomeScreen> {
                           () => setState(() => _selectedNoteIndices.clear()),
                     ),
                   ]
-                  : null,
+                  : [
+                    IconButton(
+                      icon: const Icon(Icons.logout),
+                      onPressed: _logout,
+                    ),
+                  ],
         ),
         body: Column(
           children: [
@@ -286,6 +293,19 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
       ),
     );
+  }
+
+  Future<void> _logout() async {
+    await FirebaseAuth.instance.signOut();
+    if (mounted) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => LoginScreen()),
+      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Signed out successfully')));
+    }
   }
 
   void _openNoteEditor() {

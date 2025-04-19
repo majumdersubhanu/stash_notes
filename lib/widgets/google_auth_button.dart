@@ -13,7 +13,7 @@ class GoogleAuthButton extends StatelessWidget {
         final credential = await _signInWithGoogle();
         if (credential.user != null) {
           if (context.mounted) {
-            Navigator.push(
+            Navigator.pushReplacement(
               context,
               MaterialPageRoute(builder: (context) => HomeScreen()),
             );

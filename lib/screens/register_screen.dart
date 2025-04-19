@@ -127,11 +127,16 @@ class _RegisterScreenState extends State<RegisterScreen> {
     String password,
   ) async {
     try {
-      final credential = await FirebaseAuth.instance.signInWithEmailAndPassword(
-        email: emailAddress,
-        password: password,
-      );
-
+      final credential = await FirebaseAuth.instance
+          .createUserWithEmailAndPassword(
+            email: emailAddress,
+            password: password,
+          );
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Registered successfully')));
+      }
       if (credential.user != null) {
         return true;
       }
