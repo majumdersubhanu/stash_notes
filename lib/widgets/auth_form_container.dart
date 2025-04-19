@@ -20,9 +20,8 @@ class AuthFormContainer extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.all(24),
           decoration: BoxDecoration(
-            // color: Theme.of(context).colorScheme.surfaceContainerLowest,
+            color: Theme.of(context).colorScheme.surfaceContainerLowest,
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: Theme.of(context).colorScheme.onSurface),
           ),
           child: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 400),
