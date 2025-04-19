@@ -106,17 +106,16 @@ firebase init
 
 3. Enable Email/Password & Google Sign-In in Firebase Console.
 4. Enable Firestore and use the following rules:
-
-  ```js
-  rules_version = '2';
-  service cloud.firestore {
-    match /databases/{database}/documents {
-      match /users/{userId}/notes/{noteId} {
-        allow read, write: if request.auth != null && request.auth.uid == userId;
+    ```js
+    rules_version = '2';
+    service cloud.firestore {
+      match /databases/{database}/documents {
+        match /users/{userId}/notes/{noteId} {
+          allow read, write: if request.auth != null && request.auth.uid == userId;
+        }
       }
     }
-  }
-  ```
+    ```
 
 ---
 
